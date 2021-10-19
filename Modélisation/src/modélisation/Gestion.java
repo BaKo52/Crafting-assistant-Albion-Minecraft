@@ -28,12 +28,12 @@ public class Gestion {
     */
     private void decraft(){
         //update des ressources brutes
-        inventaireSuivant.setrB8(inventaireActuel.getrB8() + 6 * inventaireActuel.getrF8());
-        inventaireSuivant.setrB7(inventaireActuel.getrB7() + 5 * inventaireActuel.getrF7());
-        inventaireSuivant.setrB6(inventaireActuel.getrB6() + 4 * inventaireActuel.getrF6());
-        inventaireSuivant.setrB5(inventaireActuel.getrB5() + 3 * inventaireActuel.getrF5());
-        inventaireSuivant.setrB4(inventaireActuel.getrB4() + 2 * inventaireActuel.getrF4());
-        inventaireSuivant.setrB3(inventaireActuel.getrB3() + 2 * inventaireActuel.getrF3());
+        inventaireSuivant.setrB8(inventaireActuel.getrB8() + ( 6 * inventaireActuel.getrF8() ));
+        inventaireSuivant.setrB7(inventaireActuel.getrB7() + ( 5 * inventaireActuel.getrF7() ));
+        inventaireSuivant.setrB6(inventaireActuel.getrB6() + ( 4 * inventaireActuel.getrF6() ));
+        inventaireSuivant.setrB5(inventaireActuel.getrB5() + ( 3 * inventaireActuel.getrF5() ));
+        inventaireSuivant.setrB4(inventaireActuel.getrB4() + ( 2 * inventaireActuel.getrF4() ));
+        inventaireSuivant.setrB3(inventaireActuel.getrB3() + ( 2 * inventaireActuel.getrF3() ));
         inventaireSuivant.setrB2(inventaireActuel.getrB2() + inventaireActuel.getrF2());
         
         //update des ressources raffinées
@@ -50,6 +50,10 @@ public class Gestion {
     Méthode qui boucle decraft et echange tant qu'il y a des ressources raffinées
     */
     public void boucle(){
+        decraft();
+        clean();
+        echange();
+        
         while ((inventaireSuivant.getrF2() 
                 + inventaireSuivant.getrF3() 
                 + inventaireSuivant.getrF4() 

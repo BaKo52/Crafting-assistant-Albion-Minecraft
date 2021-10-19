@@ -16,9 +16,7 @@ public class Inventaire {
 
     public Inventaire() {
         rF2 = rF3 = rF4 = rF5 = rF6 = rF7 = rF8 = rB2 = rB3 = rB4 = rB5 = rB6 = rB7 = rB8 = 0;
-    }
-    
-    
+    }      
     
     public Integer getrF8() {
         return rF8;
