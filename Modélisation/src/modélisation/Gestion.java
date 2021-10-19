@@ -11,41 +11,46 @@ package modélisation;
  */
 public class Gestion {
     
-    private Inventaire inventairePrecedent; // Gestion qui précède l'inventaire actuel
+    private Inventaire inventaireSuivant; // Gestion qui précède l'inventaire actuel
     private Inventaire inventaireActuel; // Gestion qui suit l'inventaire actuel
     private Inventaire total; //inventaire qui stocke les ressources brutes final
    
     /*
-    Constructeur d'inventaire
+    Constructeur de gestion
     */
-    public Gestion(Inventaire invPrecedent, Inventaire invActuel){ 
-        this.inventairePrecedent = invPrecedent;
+    public Gestion(Inventaire invActuel){ 
         this.inventaireActuel = invActuel;
+        this.inventaireSuivant = new Inventaire();
         this.total = new Inventaire();
     }
     /*
     Méthode qui permet le décraft d'objets
     */
-    public void decraft(){
-        //decraft rf
-        
-        //update rb
-        
-        //delete rb déjà comptées
+    private void decraft(){
+        inventaireActuel.decraft();
     }
     
     /*
     Méthode qui échange les deux inventaires
     L'actuel devient précédent et on copie le précédent pour créer un nouvel actuel
     */
-    public void echange(){
-        
+    private void echange(){
+        inventaireSuivant = inventaireActuel;
     }
     
     /*
     Méthode qui boucle decraft et echange tant qu'il y a des ressources raffinées
     */
     public void boucle(){
+        decraft();
+        clean();
+        echange();
+    }
+
+    /**
+     * Méthode "nettoyant" les ressources déjà compté et les stockent
+     */
+    private void clean() {
         
     }
 }
