@@ -107,15 +107,15 @@ public class Gestion {
      */
     @Override
     public String toString(){
-        String str = "";
+        String str = "------------------------------------------------------------\n";
         
-        System.out.println("Vous avez besoin de " + total.getrB2() + " ressources brutes de niveau 2.\n");
-        System.out.println("Vous avez besoin de " + total.getrB3() + " ressources brutes de niveau 3.\n");
-        System.out.println("Vous avez besoin de " + total.getrB4() + " ressources brutes de niveau 4.\n");
-        System.out.println("Vous avez besoin de " + total.getrB5() + " ressources brutes de niveau 5.\n");
-        System.out.println("Vous avez besoin de " + total.getrB6() + " ressources brutes de niveau 6.\n");
-        System.out.println("Vous avez besoin de " + total.getrB7() + " ressources brutes de niveau 7.\n");
-        System.out.println("Vous avez besoin de " + total.getrB8() + " ressources brutes de niveau 8.\n");
+        str += "Vous avez besoin de " + total.getrB2() + " ressources brutes de niveau 2.\n";
+        str += "Vous avez besoin de " + total.getrB3() + " ressources brutes de niveau 3.\n";
+        str += "Vous avez besoin de " + total.getrB4() + " ressources brutes de niveau 4.\n";
+        str += "Vous avez besoin de " + total.getrB5() + " ressources brutes de niveau 5.\n";
+        str += "Vous avez besoin de " + total.getrB6() + " ressources brutes de niveau 6.\n";
+        str += "Vous avez besoin de " + total.getrB7() + " ressources brutes de niveau 7.\n";
+        str += "Vous avez besoin de " + total.getrB8() + " ressources brutes de niveau 8.\n";
         
         return str;
     }

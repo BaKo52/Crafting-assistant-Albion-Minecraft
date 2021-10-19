@@ -48,7 +48,7 @@ public class Modélisation {
         
         g.boucle();
         
-        g.toString();
+        System.out.println(g.toString());
     }
     
 }
