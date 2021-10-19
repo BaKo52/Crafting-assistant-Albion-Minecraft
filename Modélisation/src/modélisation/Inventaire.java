@@ -6,7 +6,7 @@
 package modélisation;
 
 /**
- * Classe qui gère l'inventaire 
+ * Classe qui gère l'inventaire contenant toutes les ressources avec accesseurs
  * @author bkott
  */
 public class Inventaire {
