@@ -6,25 +6,9 @@
 package modélisation;
 
 /**
- * Classe qui gère l'inventaire
- * @author tomhu
+ *
+ * @author bkott
  */
 public class Inventaire {
     
-    private Inventaire inventairePrécédent; // Inventaire qui précède l'inventaire actuel
-    private Inventaire inventaireSuivant; // Inventaire qui suit l'inventaire actuel
-   
-    /*
-    Constructeur d'inventaire
-    */
-    public Inventaire(){
-        inventairePrécédent = new Inventaire();
-        
-    }
-    /*
-    Méthode qui permet le décraft d'objets
-    */
-    public void decraft(){
-        
-    }
 }
