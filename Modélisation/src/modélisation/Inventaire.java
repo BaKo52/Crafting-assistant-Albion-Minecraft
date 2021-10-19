@@ -13,6 +13,12 @@ public class Inventaire {
     
     private Integer rF8,rF7,rF6,rF5,rF4,rF3,rF2; // Ressources raffinées de tous les niveaux
     private Integer rB8,rB7,rB6,rB5,rB4,rB3,rB2; // Ressources brutes de tous les niveaux
+
+    public Inventaire() {
+        rF2 = rF3 = rF4 = rF5 = rF6 = rF7 = rF8 = rB2 = rB3 = rB4 = rB5 = rB6 = rB7 = rB8 = 0;
+    }
+    
+    
     
     public Integer getrF8() {
         return rF8;
@@ -104,7 +110,7 @@ public class Inventaire {
 
     public Integer getrB4() {
         return rB4;
-    }
+    }   
 
     public void setrB4(Integer rB4) {
         this.rB4 = rB4;
