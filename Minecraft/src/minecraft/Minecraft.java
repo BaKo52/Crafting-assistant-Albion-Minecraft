@@ -6,9 +6,6 @@
 package minecraft;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +18,7 @@ public class Minecraft {
      */
     public static void main(String[] args) {        
         try {
-            System.out.println(Searcher.trouve("minecraft:coal_block"));
+            System.out.println(Searcher.trouve("minecraft:anvil"));
         } catch (FileNotFoundException ex) {
             System.err.println("OSKOUR");
         }

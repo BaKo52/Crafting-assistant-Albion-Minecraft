@@ -41,7 +41,10 @@ public final class Searcher {
         HashMap<String, Integer> mapResult = new HashMap<>(); //association entre ressources et coût
         HashMap<String, String> mapKey = new HashMap<>(); //association entre symbole et ressources
         
-                
+        String data = "";
+        String chara = ""; 
+        String minecraftId = "";
+        
         Scanner monScanner = null;
         boolean hasKey = false;
         
@@ -50,23 +53,42 @@ public final class Searcher {
         } catch (FileNotFoundException ex) {
             System.err.println("SCANNER OU FICHIER");
         }
+        
+        data = monScanner.nextLine();
             
         while (monScanner.hasNextLine()) 
-        {
-            String data = monScanner.nextLine();
-            
+        {        
             if(hasKey){
-                pattern = Pattern.compile("\".\"");
-                matcher = pattern.matcher(data);
-                
-                if(matcher.find()){
-                    System.out.println(matcher.group());
+                while (!data.equals("  },")) {                    
+                    //on set le pattern pour prendre le char
+                    pattern = Pattern.compile("\".\"");
+                    matcher = pattern.matcher(data);
+                    matcher.find();
+
+                    chara = matcher.group().substring(1, 2);
+                    data = monScanner.nextLine();
+
+                    //on set le pattern pour prendre l'id de minecraft
+                    pattern = Pattern.compile("minecraft:[[\\w][_]]*");
+                    matcher = pattern.matcher(data);
+                    matcher.find();
+
+                    minecraftId = matcher.group();
+
+                    monScanner.nextLine();
+                    data = monScanner.nextLine();
+                    
+                    mapKey.put(chara, minecraftId);
                 }
+                System.out.println(mapKey);
                 
-            }
-            
-            if (data.contains("key")) {
+                
+                hasKey = false;
+            }else if (data.contains("key")) {
                 hasKey = true;
+                data = monScanner.nextLine();
+            }else{
+                data = monScanner.nextLine();
             }
         }
         
