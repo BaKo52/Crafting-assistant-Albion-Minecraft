@@ -5,6 +5,11 @@
  */
 package minecraft;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author bkott
@@ -15,6 +20,14 @@ public class Minecraft {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        Path p = null;
+        
+        try {
+            p = Searcher.search("minecraft:coal_block");
+        } catch (FileNotFoundException ex) {
+            System.err.println("OSKOUR");
+        }
+        
+        System.out.println(p.toAbsolutePath());
     }
 }
