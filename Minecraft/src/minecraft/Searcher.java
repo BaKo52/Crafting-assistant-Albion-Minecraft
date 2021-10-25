@@ -26,10 +26,22 @@ public final class Searcher {
     private static String str = "src\\Minecraft\\recipes";
     private static Path p = Paths.get(str);
     
-    public static Map<String, Integer> cost(Path p){
+    //regex car fml
+    private static Pattern pattern;
+    private static Matcher matcher;
+    
+    public static Map<String, Integer> trouve(String id) throws FileNotFoundException{
+        Map<String, Integer> map = cost(search(id));
+        
+        return map;
+    }
+    
+    private static Map<String, Integer> cost(Path p){
+        //les deux HashMaps
         HashMap<String, Integer> mapResult = new HashMap<>(); //association entre ressources et coût
         HashMap<String, String> mapKey = new HashMap<>(); //association entre symbole et ressources
         
+                
         Scanner monScanner = null;
         boolean hasKey = false;
         
@@ -44,6 +56,12 @@ public final class Searcher {
             String data = monScanner.nextLine();
             
             if(hasKey){
+                pattern = Pattern.compile("\".\"");
+                matcher = pattern.matcher(data);
+                
+                if(matcher.find()){
+                    System.out.println(matcher.group());
+                }
                 
             }
             

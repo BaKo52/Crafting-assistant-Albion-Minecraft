@@ -19,15 +19,11 @@ public class Minecraft {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        Path p = null;
-        
+    public static void main(String[] args) {        
         try {
-            p = Searcher.search("minecraft:coal_block");
+            System.out.println(Searcher.trouve("minecraft:coal_block"));
         } catch (FileNotFoundException ex) {
             System.err.println("OSKOUR");
         }
-        
-        System.out.println(p.toAbsolutePath());
     }
 }
