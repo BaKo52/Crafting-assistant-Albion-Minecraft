@@ -5,16 +5,17 @@
  */
 package minecraft;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 /**
  *
  * @author bkott
  */
-public class Minecraft {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+public final class Searcher {
+    private static Path RelativePath;
+    
+    
+    public void search()
+    
 }
