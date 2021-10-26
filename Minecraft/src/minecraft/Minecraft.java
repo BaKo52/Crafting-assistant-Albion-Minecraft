@@ -17,8 +17,9 @@ public class Minecraft {
      * @param args the command line arguments
      */
     public static void main(String[] args) {        
+        System.out.println("Entrez l'id de l'objet :");
         try {
-            System.out.println(Searcher.trouve(Clavier));
+            System.out.println(Searcher.trouve(Clavier.lireString()));
         } catch (FileNotFoundException ex) {
             System.err.println("OSKOUR");
         }

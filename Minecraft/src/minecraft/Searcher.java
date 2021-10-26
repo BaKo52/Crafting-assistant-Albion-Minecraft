@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -32,6 +33,8 @@ public final class Searcher {
     
     private static Scanner monScanner = null;
     
+    private static String data = "";
+    
     public static Map<String, Integer> trouve(String id) throws FileNotFoundException{
         Map<String, Integer> map = cost(search(id));
         
@@ -43,12 +46,14 @@ public final class Searcher {
         HashMap<String, Integer> mapResult = new HashMap<>(); //association entre ressources et coût
         HashMap<String, String> mapKey = new HashMap<>(); //association entre symbole et ressources
         
-        String data = "";
+        
         String chara = ""; 
         String minecraftId = "";
         
-        
         boolean hasKey = false;
+        boolean hasIngredients = false;
+        
+        HashMap<String, Integer> count = new HashMap<>();
         
         try {
             monScanner = new Scanner(new File(p.toString()));
@@ -84,16 +89,18 @@ public final class Searcher {
                 }
                 System.out.println(mapKey);
                 
-                mapResult = analysePattern(mapKey, p);
-                
                 hasKey = false;
-            }else if (data.contains("key") || data.contains("ingredients")) {
+            }else if (data.contains("key")) {
                 hasKey = true;
+                data = monScanner.nextLine();
+            }else if(data.contains("ingredients")){
+                hasIngredients = true;
                 data = monScanner.nextLine();
             }else{
                 data = monScanner.nextLine();
             }
         }
+        mapResult = analysePattern(mapKey, p, hasIngredients);
         
         return mapResult;
     }
@@ -111,7 +118,7 @@ public final class Searcher {
             
             while (monScanner.hasNextLine()) 
             {
-                String data = monScanner.nextLine();
+                data = monScanner.nextLine();
                 if(hasResult){
                     if(data.contains(id)){
                         res = path;
@@ -148,10 +155,95 @@ public final class Searcher {
         return result;
     }
 
-    private static HashMap<String, Integer> analysePattern(HashMap<String, String> mapKey, Path p) {
+    private static HashMap<String, Integer> analysePattern(HashMap<String, String> mapKey, Path p, boolean isShapeless) {
         HashMap<String, Integer> result = new HashMap<>();
         
+        HashMap<String, Integer> nbChar = new HashMap<>();
         
+        if(isShapeless){
+            //logique pour recette shapeless
+            System.out.println("shapeless");
+        }else{
+            //logique pour shaped
+            System.out.println("shaped");
+            
+            boolean hasPattern = false;
+            
+            try {
+                monScanner = new Scanner(p);
+            } catch (IOException ex) {
+                System.err.println("SCANNER analysePattern");
+            }
+            
+            while (monScanner.hasNextLine()) {
+                if(hasPattern){
+                    String l1 = "";
+                    String l2 = "";
+                    String l3 = "";
+                    
+                    //on set le pattern pour prendre le char
+                    pattern = Pattern.compile("\"(.)*\"");
+                    
+                    //on trouve la première ligne
+                    matcher = pattern.matcher(data);
+                    matcher.find();
+                    data = matcher.group();
+                    data = data.substring(1, data.length()-1);
+                    l1 = data.trim();
+                    //System.out.println(data);
+                    
+                    
+                    //lecture de la ligne suivante
+                    data = monScanner.nextLine();
+                    
+                    if(!data.contains("]")){
+                        //on trouve la seconde ligne si elle existe
+                        matcher = pattern.matcher(data);
+                        matcher.find();
+                        data = matcher.group();
+                        data = data.substring(1, data.length()-1);
+                        l2 = data.trim();
+                        //System.out.println(data);
+
+                        //ligne suivante
+                        data = monScanner.nextLine();
+
+                        if(!data.contains("]")){
+                            //on trouve la troisième ligne si elle existe
+                            matcher = pattern.matcher(data);
+                            matcher.find();
+                            data = matcher.group();
+                            data = data.substring(1, data.length()-1);
+                            l3 = data.trim();
+                            //System.out.println(data);
+                        }
+                    }
+                    
+                    String lFinal = l1;
+                    
+                    if(l2.isBlank()){
+                        lFinal += l2;
+                    }
+                    if(l3.isBlank()){
+                        lFinal += l3;
+                    }
+                    
+                    char c;
+                    
+                    for (int i = 0; i < lFinal.length(); i++) {
+                        c = lFinal.charAt(i);
+                        nbChar.put(c, nbChar.getOrDefault(c, 0)+1);
+                    }
+                    
+                    hasPattern = false;
+                }else if(data.contains("pattern")){
+                    hasPattern = true;
+                    data = monScanner.nextLine();
+                }else{
+                    data = monScanner.nextLine();
+                }
+            }
+        }
         
         return result;
     }
