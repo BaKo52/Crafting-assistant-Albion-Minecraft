@@ -18,7 +18,7 @@ public class Minecraft {
      */
     public static void main(String[] args) {        
         try {
-            System.out.println(Searcher.trouve("minecraft:anvil"));
+            System.out.println(Searcher.trouve(Clavier));
         } catch (FileNotFoundException ex) {
             System.err.println("OSKOUR");
         }

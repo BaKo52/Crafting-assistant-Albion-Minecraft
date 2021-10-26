@@ -30,6 +30,8 @@ public final class Searcher {
     private static Pattern pattern;
     private static Matcher matcher;
     
+    private static Scanner monScanner = null;
+    
     public static Map<String, Integer> trouve(String id) throws FileNotFoundException{
         Map<String, Integer> map = cost(search(id));
         
@@ -45,7 +47,7 @@ public final class Searcher {
         String chara = ""; 
         String minecraftId = "";
         
-        Scanner monScanner = null;
+        
         boolean hasKey = false;
         
         try {
@@ -82,9 +84,10 @@ public final class Searcher {
                 }
                 System.out.println(mapKey);
                 
+                mapResult = analysePattern(mapKey, p);
                 
                 hasKey = false;
-            }else if (data.contains("key")) {
+            }else if (data.contains("key") || data.contains("ingredients")) {
                 hasKey = true;
                 data = monScanner.nextLine();
             }else{
@@ -98,7 +101,6 @@ public final class Searcher {
     private static Path search(String id) throws FileNotFoundException{
         Path res = null;
         List<Path> paths = listFiles(p);
-        Scanner monScanner = null;
         boolean hasResult = false;
         
         for (Path path : paths) {
@@ -142,6 +144,14 @@ public final class Searcher {
         {
             System.err.println("WALK");
         }
+        
+        return result;
+    }
+
+    private static HashMap<String, Integer> analysePattern(HashMap<String, String> mapKey, Path p) {
+        HashMap<String, Integer> result = new HashMap<>();
+        
+        
         
         return result;
     }
