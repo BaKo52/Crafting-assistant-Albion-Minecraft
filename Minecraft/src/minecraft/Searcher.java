@@ -38,6 +38,8 @@ public final class Searcher {
     public static Map<String, Integer> trouve(String id) throws FileNotFoundException{
         Map<String, Integer> map = cost(search(id));
         
+        
+        
         return map;
     }
     
@@ -157,23 +159,39 @@ public final class Searcher {
 
     private static HashMap<String, Integer> analysePattern(HashMap<String, String> mapKey, Path p, boolean isShapeless) {
         HashMap<String, Integer> result = new HashMap<>();
-        
         HashMap<String, Integer> nbChar = new HashMap<>();
+        
+        try {
+            monScanner = new Scanner(p);
+        } catch (IOException ex) {
+            System.err.println("SCANNER analysePattern");
+        }
         
         if(isShapeless){
             //logique pour recette shapeless
             System.out.println("shapeless");
+            
+            boolean hasIngredients = false;            
+            
+            while (monScanner.hasNextLine()){
+                data = monScanner.nextLine();
+                
+                if(hasIngredients){
+                    pattern = Pattern.compile("\"(.)*\": \"minecraft:(.)*\"");
+                    
+                    monScanner.nextLine();
+                    
+                    
+                    
+                    hasIngredients = false;
+                }else if(data.contains("ingredients")){
+                    hasIngredients = true;
+                }
+            }
         }else{
             //logique pour shaped
-            System.out.println("shaped");
             
             boolean hasPattern = false;
-            
-            try {
-                monScanner = new Scanner(p);
-            } catch (IOException ex) {
-                System.err.println("SCANNER analysePattern");
-            }
             
             while (monScanner.hasNextLine()) {
                 if(hasPattern){
@@ -190,7 +208,6 @@ public final class Searcher {
                     data = matcher.group();
                     data = data.substring(1, data.length()-1);
                     l1 = data.trim();
-                    //System.out.println(data);
                     
                     
                     //lecture de la ligne suivante
@@ -203,7 +220,6 @@ public final class Searcher {
                         data = matcher.group();
                         data = data.substring(1, data.length()-1);
                         l2 = data.trim();
-                        //System.out.println(data);
 
                         //ligne suivante
                         data = monScanner.nextLine();
@@ -215,24 +231,28 @@ public final class Searcher {
                             data = matcher.group();
                             data = data.substring(1, data.length()-1);
                             l3 = data.trim();
-                            //System.out.println(data);
                         }
                     }
                     
                     String lFinal = l1;
                     
-                    if(l2.isBlank()){
-                        lFinal += l2;
-                    }
-                    if(l3.isBlank()){
-                        lFinal += l3;
+                    if(!l2.isEmpty()){
+                        lFinal = lFinal.concat(l2);
                     }
                     
-                    char c;
+                    if(!l3.isEmpty()){
+                        lFinal = lFinal.concat(l3);
+                    }
+                    
+                    String c;
                     
                     for (int i = 0; i < lFinal.length(); i++) {
-                        c = lFinal.charAt(i);
-                        nbChar.put(c, nbChar.getOrDefault(c, 0)+1);
+                        c = String.valueOf(lFinal.charAt(i));
+                        nbChar.put(c, nbChar.getOrDefault(c, 0) + 1);
+                    }
+                    
+                    for (String character : nbChar.keySet()) {
+                        result.put(mapKey.get(character), nbChar.get(character));
                     }
                     
                     hasPattern = false;
