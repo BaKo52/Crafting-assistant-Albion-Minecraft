@@ -12,10 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.regex.*;
 
@@ -24,8 +24,8 @@ import java.util.regex.*;
  * @author bkott
  */
 public final class Searcher {
-    private static String str = "src\\Minecraft\\recipes";
-    private static Path p = Paths.get(str);
+    private static final String str = "src\\Minecraft\\recipes";
+    private static final Path p = Paths.get(str);
     
     //regex car fml
     private static Pattern pattern;
@@ -35,19 +35,76 @@ public final class Searcher {
     
     private static String data = "";
     
-    public static Map<String, Integer> trouve(String id) throws FileNotFoundException{
-        Map<String, Integer> map = cost(search(id));
+    public static Map<String, Integer> trouve(String id) throws NullPointerException, FileNotFoundException, IOException{
+        Map<String, Integer> map = ingredients(search(id));
+        Path p;
+        int count; //compte de ressource données par craft
+        int nbRequis; //nombre de ressource requise
+        String entry;
         
+        Object listeKey[] = map.keySet().toArray();
         
+        for (Object entree : listeKey) {
+            entry = entree.toString();
+            
+            p = search(entry);
+            
+            if(!p.equals(null)){
+                Map<String, Integer> temp = ingredients(search(entry));
+                
+                for (String ancetre : temp.keySet()) {
+                    count = count(p);
+                
+                    nbRequis = map.get(entry) / count;
+                    if((map.get(entry) % count) != 0){
+                        nbRequis++;
+                    }
+
+                    map.put(ancetre, nbRequis * count);
+                }
+                
+                map.remove(entry);
+            }
+        }
         
         return map;
     }
     
-    private static Map<String, Integer> cost(Path p){
+    private static int count(Path p) throws NullPointerException, FileNotFoundException, IOException{
+        int count = 1;
+        boolean hasCount = false;
+        
+        monScanner = new Scanner(p);
+        
+        
+        while (monScanner.hasNextLine()) {            
+            if(hasCount){
+                pattern = Pattern.compile("(\\d)");
+                matcher = pattern.matcher(data);
+                matcher.find();
+                
+                data = matcher.group();
+                
+                count = Integer.parseInt(data);
+                
+                data = monScanner.nextLine();
+                
+                hasCount = false;
+            }else if(data.contains("count")){
+                hasCount = true;
+            }else{
+                data = monScanner.nextLine();
+            }
+        }
+        
+        
+        return count;
+    }
+    
+    private static Map<String, Integer> ingredients(Path p) throws NullPointerException, FileNotFoundException{
         //les deux HashMaps
         HashMap<String, Integer> mapResult = new HashMap<>(); //association entre ressources et coût
         HashMap<String, String> mapKey = new HashMap<>(); //association entre symbole et ressources
-        
         
         String chara = ""; 
         String minecraftId = "";
@@ -57,11 +114,7 @@ public final class Searcher {
         
         HashMap<String, Integer> count = new HashMap<>();
         
-        try {
-            monScanner = new Scanner(new File(p.toString()));
-        } catch (FileNotFoundException ex) {
-            System.err.println("SCANNER OU FICHIER");
-        }
+        monScanner = new Scanner(new File(p.toString()));
         
         data = monScanner.nextLine();
             
@@ -89,7 +142,7 @@ public final class Searcher {
                     
                     mapKey.put(chara, minecraftId);
                 }
-                System.out.println(mapKey);
+                //System.out.println(mapKey);
                 
                 hasKey = false;
             }else if (data.contains("key")) {
@@ -111,10 +164,11 @@ public final class Searcher {
         Path res = null;
         List<Path> paths = listFiles(p);
         boolean hasResult = false;
+        File myObj = null;
         
         for (Path path : paths) {
-            System.out.println("On examine :\n      " + path);
-            File myObj = new File(path.toString());
+            //System.out.println("On examine :\n      " + path);
+            myObj = new File(path.toString());
             
             monScanner = new Scanner(myObj);
             
@@ -122,10 +176,16 @@ public final class Searcher {
             {
                 data = monScanner.nextLine();
                 if(hasResult){
-                    if(data.contains(id)){
-                        res = path;
-                    }
+                    // if(data.contains(id)){
+                    //     res = path;
+                    // }
                     
+                    pattern = Pattern.compile(id + "\"");
+                    matcher = pattern.matcher(data);
+                    
+                    if(matcher.find()){
+                        res = path;
+                    }                    
                     
                     hasResult = false;
                 }
@@ -169,23 +229,38 @@ public final class Searcher {
         
         if(isShapeless){
             //logique pour recette shapeless
-            System.out.println("shapeless");
             
             boolean hasIngredients = false;            
             
             while (monScanner.hasNextLine()){
-                data = monScanner.nextLine();
+                
                 
                 if(hasIngredients){
-                    pattern = Pattern.compile("\"(.)*\": \"minecraft:(.)*\"");
+                    data = monScanner.nextLine();
+                    pattern = Pattern.compile("minecraft:(.)*");
                     
-                    monScanner.nextLine();
-                    
-                    
+                    while(!data.contains("]")){
+                        data = monScanner.nextLine();
+                        matcher = pattern.matcher(data);
+                        if(matcher.find()){
+                            data = matcher.group();
+                            
+                            data = data.substring(0, data.length()-1);
+                        
+                            result.put(data, result.getOrDefault(data, 0) + 1);
+
+                            data = monScanner.nextLine();
+
+                            data = monScanner.nextLine();
+                        }  
+                    }                  
                     
                     hasIngredients = false;
                 }else if(data.contains("ingredients")){
                     hasIngredients = true;
+                    data = monScanner.nextLine();
+                }else{
+                    data = monScanner.nextLine();
                 }
             }
         }else{
@@ -248,7 +323,10 @@ public final class Searcher {
                     
                     for (int i = 0; i < lFinal.length(); i++) {
                         c = String.valueOf(lFinal.charAt(i));
-                        nbChar.put(c, nbChar.getOrDefault(c, 0) + 1);
+                        
+                        if(!c.contains(" ")){
+                            nbChar.put(c, nbChar.getOrDefault(c, 0) + 1);
+                        }
                     }
                     
                     for (String character : nbChar.keySet()) {

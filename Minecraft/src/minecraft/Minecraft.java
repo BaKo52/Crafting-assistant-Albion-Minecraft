@@ -6,6 +6,7 @@
 package minecraft;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  *
@@ -21,7 +22,15 @@ public class Minecraft {
         try {
             System.out.println(Searcher.trouve(Clavier.lireString()));
         } catch (FileNotFoundException ex) {
-            System.err.println("OSKOUR");
+            System.err.println("Problème de scanner aka path");
+            System.err.println(ex.getMessage());
+        } catch (NullPointerException ex) {
+            System.err.println("Saisie incorrecte");
+            System.err.println(ex.getMessage());
+        } catch (IOException ex){
+            System.err.println("IO");
+            System.err.println(ex.getClass());
+            System.err.println(ex.getMessage());
         }
     }
 }
