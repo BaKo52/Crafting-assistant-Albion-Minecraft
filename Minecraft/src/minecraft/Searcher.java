@@ -8,6 +8,8 @@ package minecraft;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.regex.*;
 
@@ -36,42 +37,64 @@ public final class Searcher {
     private static String data = "";
     
     public static Map<String, Integer> trouve(String id) throws NullPointerException, FileNotFoundException, IOException{
-        Map<String, Integer> map = ingredients(search(id));
-        Path p;
+        Map<String, Integer> mapIngredientsParent = ingredients(search(id));
+        Map<String, Integer> mapIngredientsFils = new HashMap<>();
+        Map<String, Integer> mapSurplus = new HashMap<>();
+        
+        Path chemin;
         int nbItemCree; //compte de ressource données par craft
         int nbItemRequis; //nombre de ressource requise
         int nbCraftRequis; //nombre de fois ou le craft devra être fait
         String entryString;
         
-        Object listeKey[] = map.keySet().toArray();
-        
-        for (Object entryObject : listeKey) {
-            entryString = entryObject.toString();
-            p = search(entryString);
+        while (estDecraftable(mapIngredientsParent)) {
+            Object listeKey[] = mapIngredientsParent.keySet().toArray();
             
-            if(!p.equals(null)){
-                Map<String, Integer> mapIngredientsFils = ingredients(search(entryString));
-                
-                System.out.println(mapIngredientsFils);
-                
-                for (String ancetre : mapIngredientsFils.keySet()) {
-                    nbItemCree = count(p);
-                    nbItemRequis = map.get(entryObject);
-                    nbCraftRequis = nbItemRequis / nbItemCree;
-                     
-                    if((nbItemRequis % nbItemCree) != 0){
-                        nbCraftRequis++;
+            for (Object entryObject : listeKey) {
+                entryString = entryObject.toString();
+                chemin = search(entryString);
+
+                if(chemin != null){
+                    nbItemCree = count(chemin);
+                    mapIngredientsFils = ingredients(search(entryString));
+
+                    nbItemRequis = mapIngredientsParent.get(entryObject.toString());
+                    
+
+                    if((nbItemRequis % nbItemCree) == 0){
+                        nbCraftRequis = nbItemRequis / nbItemCree;
+                    }else{
+                        float nbItemRequisF = nbItemRequis;
+                        float nbItemCreeF = nbItemCree;
+                        
+                        nbCraftRequis = BigDecimal.valueOf(nbItemRequisF / nbItemCreeF).setScale(0, RoundingMode.UP).intValue();
                     }
                     
-                    //LE PROBLEME EST LA FDP !!!!!!!
-                    map.put(ancetre, nbCraftRequis * mapIngredientsFils.get(entryObject));
+                    for (String filsObject : mapIngredientsFils.keySet()) {
+                        mapIngredientsParent.put(filsObject.toString(), mapIngredientsParent.getOrDefault(filsObject.toString(), 0) + nbCraftRequis * mapIngredientsFils.get(filsObject.toString()));
+                    }
+                    
+                    mapIngredientsParent.remove(entryString);
                 }
-                
-                map.remove(entryString);
             }
         }
         
-        return map;
+        return mapIngredientsParent;
+    }
+    
+    private static boolean estDecraftable(Map<String, Integer> map) throws FileNotFoundException{
+        boolean bool = false;
+        String id = "";
+        
+        for (Object o : map.keySet()) {
+            id = o.toString();
+            
+            if(search(id) != null){
+                bool = true;
+            }
+        }
+        
+        return bool;
     }
     
     private static int count(Path p) throws NullPointerException, FileNotFoundException, IOException{
