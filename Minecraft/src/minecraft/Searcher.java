@@ -13,6 +13,8 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,10 @@ public final class Searcher {
     private static final String str = "src\\Minecraft\\recipes";
     private static final Path p = Paths.get(str);
     
+    private static Map<String, Integer> mapSurplus = new HashMap<>();
+    private static Map<String, Integer> mapIngredientsParent = new HashMap<>();
+    private static Map<String, Integer> mapIngredientsFils = new HashMap<>();
+    
     //regex car fml
     private static Pattern pattern;
     private static Matcher matcher;
@@ -37,9 +43,7 @@ public final class Searcher {
     private static String data = "";
     
     public static Map<String, Integer> trouve(String id) throws NullPointerException, FileNotFoundException, IOException{
-        Map<String, Integer> mapIngredientsParent = ingredients(search(id));
-        Map<String, Integer> mapIngredientsFils = new HashMap<>();
-        Map<String, Integer> mapSurplus = new HashMap<>();
+        mapIngredientsParent = ingredients(search(id));
         
         Path chemin;
         int nbItemCree; //compte de ressource données par craft
@@ -50,6 +54,7 @@ public final class Searcher {
         while (estDecraftable(mapIngredientsParent)) {
             Object listeKey[] = mapIngredientsParent.keySet().toArray();
             
+            
             for (Object entryObject : listeKey) {
                 entryString = entryObject.toString();
                 chemin = search(entryString);
@@ -59,7 +64,6 @@ public final class Searcher {
                     mapIngredientsFils = ingredients(search(entryString));
 
                     nbItemRequis = mapIngredientsParent.get(entryObject.toString());
-                    
 
                     if((nbItemRequis % nbItemCree) == 0){
                         nbCraftRequis = nbItemRequis / nbItemCree;
@@ -68,10 +72,14 @@ public final class Searcher {
                         float nbItemCreeF = nbItemCree;
                         
                         nbCraftRequis = BigDecimal.valueOf(nbItemRequisF / nbItemCreeF).setScale(0, RoundingMode.UP).intValue();
-                    }
+                    }                           
                     
-                    for (String filsObject : mapIngredientsFils.keySet()) {
-                        mapIngredientsParent.put(filsObject.toString(), mapIngredientsParent.getOrDefault(filsObject.toString(), 0) + nbCraftRequis * mapIngredientsFils.get(filsObject.toString()));
+                    mapSurplus.put(entryString, nbItemCree - nbItemRequis);
+                    mapIngredientsParent.remove(entryString);
+                    
+                    for (String filsString : mapIngredientsFils.keySet()) {
+                        checkSurplus(entryString, filsString, nbItemRequis, nbCraftRequis);
+                        mapIngredientsParent.put(filsString, mapIngredientsParent.getOrDefault(filsString, 0) + nbCraftRequis * mapIngredientsFils.get(filsString));
                     }
                     
                     mapIngredientsParent.remove(entryString);
@@ -80,6 +88,31 @@ public final class Searcher {
         }
         
         return mapIngredientsParent;
+    }
+    
+    private static boolean checkSurplus(String idToCheck, String idToCraft, int nbItemRequis, int nbCraftRequis){
+        boolean res;
+        
+        if(mapSurplus.containsKey(idToCheck)){
+            if(mapSurplus.get(idToCheck) >= nbItemRequis){
+                res = true;
+                if((mapSurplus.get(idToCheck) - nbItemRequis) == 0){
+                    mapSurplus.remove(idToCheck);
+                    mapIngredientsParent.remove(idToCraft);
+                }else{
+                    mapSurplus.put(idToCheck, mapSurplus.get(idToCheck) - nbItemRequis);
+                    mapIngredientsParent.remove(idToCraft);
+                }
+            }else{
+                mapSurplus.put(idToCheck, mapSurplus.get(idToCheck) - nbItemRequis);
+                mapIngredientsParent.replace(idToCraft, mapIngredientsParent.get(idToCraft) - mapSurplus.get(idToCheck));
+                res = false;
+            }
+        }else{
+            res = false;
+        }
+        
+        return res;
     }
     
     private static boolean estDecraftable(Map<String, Integer> map) throws FileNotFoundException{
