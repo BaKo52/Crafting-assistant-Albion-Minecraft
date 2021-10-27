@@ -74,15 +74,14 @@ public final class Searcher {
                         nbCraftRequis = BigDecimal.valueOf(nbItemRequisF / nbItemCreeF).setScale(0, RoundingMode.UP).intValue();
                     }                           
                     
-                    mapSurplus.put(entryString, nbItemCree - nbItemRequis);
-                    mapIngredientsParent.remove(entryString);
+                    mapSurplus.put(entryString, nbItemCree * nbCraftRequis - nbItemRequis);
+                    
                     
                     for (String filsString : mapIngredientsFils.keySet()) {
+                        //Si on décommente la ligne suivante on peut avoir le bon résultat pour l'épée et houe en bois mais NullPointerException pour la quasi-totalité des autres crafts
                         checkSurplus(entryString, filsString, nbItemRequis, nbCraftRequis);
                         mapIngredientsParent.put(filsString, mapIngredientsParent.getOrDefault(filsString, 0) + nbCraftRequis * mapIngredientsFils.get(filsString));
                     }
-                    
-                    mapIngredientsParent.remove(entryString);
                 }
             }
         }
