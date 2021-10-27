@@ -38,32 +38,36 @@ public final class Searcher {
     public static Map<String, Integer> trouve(String id) throws NullPointerException, FileNotFoundException, IOException{
         Map<String, Integer> map = ingredients(search(id));
         Path p;
-        int count; //compte de ressource données par craft
-        int nbRequis; //nombre de ressource requise
-        String entry;
+        int nbItemCree; //compte de ressource données par craft
+        int nbItemRequis; //nombre de ressource requise
+        int nbCraftRequis; //nombre de fois ou le craft devra être fait
+        String entryString;
         
         Object listeKey[] = map.keySet().toArray();
         
-        for (Object entree : listeKey) {
-            entry = entree.toString();
-            
-            p = search(entry);
+        for (Object entryObject : listeKey) {
+            entryString = entryObject.toString();
+            p = search(entryString);
             
             if(!p.equals(null)){
-                Map<String, Integer> temp = ingredients(search(entry));
+                Map<String, Integer> mapIngredientsFils = ingredients(search(entryString));
                 
-                for (String ancetre : temp.keySet()) {
-                    count = count(p);
+                System.out.println(mapIngredientsFils);
                 
-                    nbRequis = map.get(entry) / count;
-                    if((map.get(entry) % count) != 0){
-                        nbRequis++;
+                for (String ancetre : mapIngredientsFils.keySet()) {
+                    nbItemCree = count(p);
+                    nbItemRequis = map.get(entryObject);
+                    nbCraftRequis = nbItemRequis / nbItemCree;
+                     
+                    if((nbItemRequis % nbItemCree) != 0){
+                        nbCraftRequis++;
                     }
-
-                    map.put(ancetre, nbRequis * count);
+                    
+                    //LE PROBLEME EST LA FDP !!!!!!!
+                    map.put(ancetre, nbCraftRequis * mapIngredientsFils.get(entryObject));
                 }
                 
-                map.remove(entry);
+                map.remove(entryString);
             }
         }
         
@@ -230,35 +234,29 @@ public final class Searcher {
         if(isShapeless){
             //logique pour recette shapeless
             
-            boolean hasIngredients = false;            
+            boolean hasIngredients = false; 
+            String tempStr = "";
             
             while (monScanner.hasNextLine()){
-                
-                
                 if(hasIngredients){
                     data = monScanner.nextLine();
                     pattern = Pattern.compile("minecraft:(.)*");
                     
-                    while(!data.contains("]")){
+                    while(!data.contains("]") && monScanner.hasNextLine()){
                         data = monScanner.nextLine();
                         matcher = pattern.matcher(data);
                         if(matcher.find()){
-                            data = matcher.group();
+                            tempStr = matcher.group();
                             
-                            data = data.substring(0, data.length()-1);
+                            tempStr = tempStr.substring(0, tempStr.length()-1);
                         
-                            result.put(data, result.getOrDefault(data, 0) + 1);
-
-                            data = monScanner.nextLine();
-
-                            data = monScanner.nextLine();
+                            result.put(tempStr, result.getOrDefault(tempStr, 0) + 1);
                         }  
                     }                  
                     
                     hasIngredients = false;
                 }else if(data.contains("ingredients")){
                     hasIngredients = true;
-                    data = monScanner.nextLine();
                 }else{
                     data = monScanner.nextLine();
                 }
