@@ -76,10 +76,12 @@ public final class Searcher {
                     
                     mapSurplus.put(entryString, nbItemCree * nbCraftRequis - nbItemRequis);
                     
+                    //n'enlevez pas cette ligne sinon boucle infinie
+                    mapIngredientsParent.remove(entryString);
                     
                     for (String filsString : mapIngredientsFils.keySet()) {
                         //Si on décommente la ligne suivante on peut avoir le bon résultat pour l'épée et houe en bois mais NullPointerException pour la quasi-totalité des autres crafts
-                        checkSurplus(entryString, filsString, nbItemRequis, nbCraftRequis);
+                        //checkSurplus(entryString, filsString, nbItemRequis, nbCraftRequis);
                         mapIngredientsParent.put(filsString, mapIngredientsParent.getOrDefault(filsString, 0) + nbCraftRequis * mapIngredientsFils.get(filsString));
                     }
                 }
